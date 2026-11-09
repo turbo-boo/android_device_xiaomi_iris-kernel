@@ -13,8 +13,16 @@ Xiaomi has not published the kernel source for this device.
 | `vendor/*.ko` | `/vendor/lib/modules/*.ko` |
 | `vendor/modules.load` | `/vendor/lib/modules/modules.load`, duplicate lines removed |
 
-The modules are installed to `/vendor/lib/modules` through
+The vendor modules are installed to `/vendor/lib/modules` through
 `BOARD_VENDOR_KERNEL_MODULES`; the build generates `modules.dep` and friends.
+
+The stock `vendor_boot.img` also carries 42 modules in `lib/modules/5.4-gki`
+(clocks, interconnect, pinctrl, regulators, SMMU, UFS). They are not shipped:
+they were built for a GKI kernel (`module_layout` CRC `0x1e5b7ab7`, while this
+kernel and its vendor modules use `0x945d02f2`), so none of them loads, and all
+of those drivers are built into this kernel. Stock first stage init loads zero
+modules from that directory; with the modules in a flat `/lib/modules`, the
+first failed module makes first stage init abort and the kernel panic.
 
 ## Updating
 
